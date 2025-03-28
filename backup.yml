@@ -1,0 +1,25 @@
+name: Backup Logs
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # 毎日0時に実行（UTC時間）
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: リポジトリをチェックアウト
+        uses: actions/checkout@v3
+
+      - name: シェルスクリプトを実行
+        run: |
+          chmod +x backup.sh
+          ./backup.sh
+
+      - name: バックアップ結果をコミット
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add backup/
+          git commit -m "GitHub Actions によるバックアップ実行" || echo "No changes to commit"
+          git push
